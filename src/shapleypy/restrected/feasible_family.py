@@ -38,3 +38,12 @@ class FeasibleFamily:
         except TypeError:
             return False
         return C in self._F
+    def n(self) -> int:
+        return self._n
+
+    def coalitions(self) -> set[Coalition]:
+        return set(self._F)
+
+    def is_feasible(self, C: Coalition) -> bool:
+        return C in self._F
+    
