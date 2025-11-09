@@ -160,8 +160,16 @@ class FeasibleFamily:
         F = self._F
         for C in F:
             if C != EMPTY_COALITION:
-                # at least one immediate predecessor must be feasible
                 if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
+                    return False
+        return True
+    
+    def is_union_closed(self) -> bool:
+        F = self._F
+        L = list(F)
+        for i, A in enumerate(L):
+            for B in L[i:]:
+                if (A + B) not in F:
                     return False
         return True
 
