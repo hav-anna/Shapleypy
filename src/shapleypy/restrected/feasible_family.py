@@ -1,13 +1,15 @@
 from collections.abc import Iterable
 from shapleypy.coalition import (
     Coalition,
-    EMPTY_COALITION
+    EMPTY_COALITION,
      )
 from shapleypy.constants import (
     MAXIMUM_NUMBER_OF_PLAYERS,
     MINIMUM_NUMBER_OF_PLAYERS,
     COALITION_NUMBER_OF_PLAYERS_ERROR,
 )
+from shapleypy._typing import Player, Players
+from typing import overload
 
 
 class FeasibleFamily:
@@ -47,3 +49,55 @@ class FeasibleFamily:
     def is_feasible(self, C: Coalition) -> bool:
         return C in self._F
     
+    @overload
+    def add(self, S: Coalition, *, enforce_heredity: bool = True, enforce_union_closed: bool = False) -> None: ...
+    @overload
+    def add(self, S: Players | Player, *, enforce_heredity: bool = True, enforce_union_closed: bool = False) -> None: ...
+
+    def add(
+        self,
+        S: Coalition | Players | Player,
+        *,
+        enforce_heredity: bool = True,
+        enforce_union_closed: bool = False,
+    ) -> None:
+        
+        C = self._to_coalition(S)
+        n = self._n
+        for i in C.get_players:
+            if i >= n or i < 0:
+                raise ValueError("Coalition contains a player outside {0, …, n-1}.")
+        if C not in self._F:
+            self._F.add(C)
+
+        if enforce_heredity:
+            for T in C.all_subcoalitions():
+                self._F.add(T)
+
+        if enforce_union_closed:
+            self._close_under_union()
+
+
+    def _close_under_union(self) -> None:
+        changed = True
+        while changed:
+            changed = False
+            to_add: set[Coalition] = set()
+            L = list(self._F)
+            for i, A in enumerate(L):
+                for B in L[i:]:
+                    U = A + B
+                    if U not in self._F:
+                        to_add.add(U)
+            if to_add:
+                self._F |= to_add
+                changed = True
+
+    def _to_coalition(self, obj: object) -> Coalition:
+        if isinstance(obj, Coalition):
+            return obj
+        if isinstance(obj, int):
+            return Coalition.from_players(obj) 
+        if isinstance(obj, Iterable):
+            return Coalition.from_players(obj) 
+        raise TypeError("Expected Coalition | Player | Iterable[Player].")
