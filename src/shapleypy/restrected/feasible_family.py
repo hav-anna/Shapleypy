@@ -14,6 +14,17 @@ from shapleypy._typing import Player, Players
 class FeasibleFamily:
 
     def __init__(self, n_players: int, coalitions: Iterable[Coalition] | None = None) -> None:
+        """
+        Initialize a FeasibleFamily.
+
+        Args:
+            n_players (int): Number of players N, players are 0..n_players-1.
+            coalitions (Iterable[Coalition] | None): Initial feasible coalitions.
+
+        Raises:
+            ValueError: If n_players is out of allowed bounds or any coalition
+                contains a player outside {0, …, n_players-1}.
+        """
         if n_players > MAXIMUM_NUMBER_OF_PLAYERS or n_players < MINIMUM_NUMBER_OF_PLAYERS:
             raise ValueError(COALITION_NUMBER_OF_PLAYERS_ERROR)
 
@@ -28,24 +39,61 @@ class FeasibleFamily:
         self._F.add(EMPTY_COALITION)
 
     def __repr__(self) -> str:
+        """
+        Returns:
+            str: Representation with n and number of coalitions.
+        """
         return f"FeasibleFamily(n={self.n}, size={len(self._F)})"
     
     def __len__(self) -> int:
+        """
+        Returns:
+            int: Number of feasible coalitions.
+        """
         return len(self._F)
     
     def __contains__(self, obj: object) -> bool:
+        """
+        Checks if an object (Coalition | Player | Iterable[Player]) is feasible.
+
+        Args:
+            obj (object): Coalition, single Player, or Iterable[Player].
+
+        Returns:
+            bool: True if the corresponding coalition is in F, False otherwise.
+        """
         try:
             C = self._to_coalition(obj)
         except TypeError:
             return False
         return C in self._F
+    
     def n(self) -> int:
+        """
+        Returns:
+            int: Number of players.
+        """
         return self._n
 
     def coalitions(self) -> set[Coalition]:
+        """
+        Returns a copy of the feasible family (set of coalitions).
+
+        Returns:
+            set[Coalition]: A shallow copy of F.
+        """
         return set(self._F)
 
     def is_feasible(self, C: Coalition) -> bool:
+        """
+        Test whether a coalition is feasible.
+
+        Args:
+            C (Coalition): Coalition to test.
+
+        Returns:
+            bool: True iff C ∈ F.
+        """
         return C in self._F
     
     def add(
@@ -55,7 +103,17 @@ class FeasibleFamily:
         enforce_heredity: bool = True,
         enforce_union_closed: bool = False,
     ) -> None:
-        
+        """
+        Add a coalition to F, optionally closing under subcoalitions and/or unions.
+
+        Args:
+            S (Coalition | Players | Player): Coalition or players description.
+            enforce_heredity (bool): If True, add all subcoalitions of S (downward closure).
+            enforce_union_closed (bool): If True, repeatedly add unions A∪B until fixed point.
+
+        Raises:
+            ValueError: If S contains a player outside {0, …, n-1}.
+        """
         C = self._to_coalition(S)
         n = self._n
         for i in C.get_players:
@@ -73,11 +131,30 @@ class FeasibleFamily:
 
 
     def remove(self, S: Coalition | Players | Player) -> None:
+        """
+        Remove a coalition from F (does NOT remove ∅ and does NOT re-close).
+
+        Args:
+            S (Coalition | Players | Player): Coalition to remove.
+
+        Notes:
+            This operation does not maintain any closure properties automatically.
+            If you want to keep e.g. heredity/union-closedness, re-run closure
+            after removals or avoid removing elements that would break it.
+
+        """
         C = self._to_coalition(S)
         if C != EMPTY_COALITION:
             self._F.discard(C)
 
     def _close_under_union(self) -> None:
+        """
+        Repeatedly add A∪B for A,B ∈ F until a fixed point is reached.
+
+        Notes:
+            This is O(|F|^2) per iteration; for large families consider a more
+            incremental strategy.
+        """
         changed = True
         while changed:
             changed = False
@@ -93,6 +170,19 @@ class FeasibleFamily:
                 changed = True
 
     def _to_coalition(self, obj: object) -> Coalition:
+        """
+        Coerce input into a Coalition.
+
+        Args:
+            obj (object): Coalition | Player | Iterable[Player].
+
+        Returns:
+            Coalition: The corresponding coalition.
+
+        Raises:
+            TypeError: If obj cannot be interpreted as a coalition.
+            ValueError: If players are outside global allowed bounds.
+        """
         if isinstance(obj, Coalition):
             return obj
         if isinstance(obj, int):
