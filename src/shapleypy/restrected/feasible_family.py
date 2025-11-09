@@ -9,7 +9,6 @@ from shapleypy.constants import (
     COALITION_NUMBER_OF_PLAYERS_ERROR,
 )
 from shapleypy._typing import Player, Players
-from typing import overload
 
 
 class FeasibleFamily:
@@ -49,11 +48,6 @@ class FeasibleFamily:
     def is_feasible(self, C: Coalition) -> bool:
         return C in self._F
     
-    @overload
-    def add(self, S: Coalition, *, enforce_heredity: bool = True, enforce_union_closed: bool = False) -> None: ...
-    @overload
-    def add(self, S: Players | Player, *, enforce_heredity: bool = True, enforce_union_closed: bool = False) -> None: ...
-
     def add(
         self,
         S: Coalition | Players | Player,
@@ -77,6 +71,11 @@ class FeasibleFamily:
         if enforce_union_closed:
             self._close_under_union()
 
+
+    def remove(self, S: Coalition | Players | Player) -> None:
+        C = self._to_coalition(S)
+        if C != EMPTY_COALITION:
+            self._F.discard(C)
 
     def _close_under_union(self) -> None:
         changed = True
