@@ -147,6 +147,15 @@ class FeasibleFamily:
         if C != EMPTY_COALITION:
             self._F.discard(C)
 
+    def is_hereditary(self) -> bool:
+        F = self._F
+        for C in F:
+            for T in C.all_subcoalitions():
+                if T not in F:
+                    return False
+        return True
+    
+
     def _close_under_union(self) -> None:
         """
         Repeatedly add A∪B for A,B ∈ F until a fixed point is reached.
@@ -190,3 +199,4 @@ class FeasibleFamily:
         if isinstance(obj, Iterable):
             return Coalition.from_players(obj) 
         raise TypeError("Expected Coalition | Player | Iterable[Player].")
+    
