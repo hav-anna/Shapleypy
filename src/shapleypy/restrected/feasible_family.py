@@ -25,3 +25,16 @@ class FeasibleFamily:
                 if i >= n or i < 0:
                     raise ValueError("Coalition contains a player outside {0, …, n-1}.")
         self._F.add(EMPTY_COALITION)
+
+    def __repr__(self) -> str:
+        return f"FeasibleFamily(n={self.n}, size={len(self._F)})"
+    
+    def __len__(self) -> int:
+        return len(self._F)
+    
+    def __contains__(self, obj: object) -> bool:
+        try:
+            C = self._to_coalition(obj)
+        except TypeError:
+            return False
+        return C in self._F
