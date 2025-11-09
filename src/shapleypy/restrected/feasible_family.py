@@ -7,6 +7,7 @@ from shapleypy.constants import (
     MAXIMUM_NUMBER_OF_PLAYERS,
     MINIMUM_NUMBER_OF_PLAYERS,
     COALITION_NUMBER_OF_PLAYERS_ERROR,
+    all_one_player_missing_subcoalitions,
 )
 from shapleypy._typing import Player, Players
 
@@ -154,6 +155,16 @@ class FeasibleFamily:
                 if T not in F:
                     return False
         return True
+    
+    def is_accessible(self) -> bool:
+        F = self._F
+        for C in F:
+            if C != EMPTY_COALITION:
+                # at least one immediate predecessor must be feasible
+                if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
+                    return False
+        return True
+
     
 
     def _close_under_union(self) -> None:
