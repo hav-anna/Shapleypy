@@ -60,6 +60,16 @@ class RestrictedGame:
             set[Coalition]: Copy of feasible coalitions.
         """
         return self._F.coalitions()
+    
+    def value(self, S: Coalition | Player | Players | Iterable[Player]) -> float:
+        return self.get_value(S)
+
+    def set_values(self, items: Iterable[tuple[Coalition | Players | Player | Iterable[Player], float]]) -> None:
+        for S, v in items:
+            self.set_value(S, v)
+
+    def grand_coalition(self) -> Coalition:
+        return Coalition.grand_coalition(self.number_of_players)
 
     def is_feasible(self, S: Coalition | Player | Players | Iterable[Player]) -> bool:
         C = self._to_coalition(S)
@@ -85,3 +95,4 @@ class RestrictedGame:
         if isinstance(S, Iterable):
             return Coalition.from_players(S)
         raise TypeError("Expected Coalition | Player | Iterable[Player].")
+    
