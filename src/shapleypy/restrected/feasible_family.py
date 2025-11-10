@@ -149,22 +149,40 @@ class FeasibleFamily:
             self._F.discard(C)
 
     def is_hereditary(self) -> bool:
+        """
+        Check if F is downward closed: ∀C∈F, ∀T⊆C ⇒ T∈F.
+
+        Returns:
+            bool: True if hereditary, False otherwise.
+        """
         F = self._F
         for C in F:
             for T in C.all_subcoalitions():
                 if T not in F:
                     return False
         return True
-    
+
     def is_accessible(self) -> bool:
+        """
+        Check accessibility: ∀C∈F, C≠∅ ⇒ ∃i∈C with C\\{i}∈F.
+
+        Returns:
+            bool: True if accessible, False otherwise.
+        """
         F = self._F
         for C in F:
             if C != EMPTY_COALITION:
                 if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
                     return False
         return True
-    
+
     def is_union_closed(self) -> bool:
+        """
+        Check union-closedness: ∀A,B∈F ⇒ A∪B ∈ F.
+
+        Returns:
+            bool: True if union-closed, False otherwise.
+        """
         F = self._F
         L = list(F)
         for i, A in enumerate(L):
