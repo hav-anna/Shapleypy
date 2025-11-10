@@ -30,3 +30,30 @@ class RestrictedGame:
         """
         return f"RestrictedGame(n={self.number_of_players}, |F|={len(self._F)})"
 
+    @property
+    def number_of_players(self) -> int:
+        """
+        Returns:
+            int: Number of players N.
+        """
+        return self._game.number_of_players
+
+    @property
+    def base_game(self) -> Game:
+        """
+        Access to the underlying Game instance.
+
+        Returns:
+            Game: The underlying TU-game.
+        """
+        return self._game
+
+    @property
+    def feasible(self) -> FeasibleFamily:
+        """
+        Accessor for the feasible family.
+
+        Returns:
+            FeasibleFamily: The feasible family F.
+        """
+        return self._F
