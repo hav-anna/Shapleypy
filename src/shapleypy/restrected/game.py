@@ -54,22 +54,34 @@ class RestrictedGame:
     @property
     def feasible(self) -> FeasibleFamily:
         """
-        Accessor for the feasible family.
+        Return a defensive copy of the feasible set F.
 
         Returns:
-            FeasibleFamily: The feasible family F.
+            set[Coalition]: Copy of feasible coalitions.
         """
-        return self._F
+        return self._F.coalitions()
 
-    def is_feasible(self, S: Coalition) -> bool:
-        return self._F.is_feasible(S)
+    def is_feasible(self, S: Coalition | Player | Players | Iterable[Player]) -> bool:
+        C = self._to_coalition(S)
+        return self._F.is_feasible(C)
 
-    def get_value(self, S: Coalition) -> float:
-        if not self.is_feasible(S):
-            raise ValueError("Coalition is not feasible")
-        return self._game.get_value(S)
+    def get_value(self, S: Coalition | Player | Players | Iterable[Player]) -> float:
+        C = self._to_coalition(S)
+        if not self._F.is_feasible(C):
+            raise ValueError("Coalition is not feasible (S ∉ F).")
+        return self._game.get_value(C)
 
-    def set_value(self, S: Coalition, value: float) -> None:
-        if not self.is_feasible(S):
-            raise ValueError("Cannot set value: coalition not feasible")
-        self._game.set_value(S, value)
+    def set_value(self, S: Coalition | Player | Players | Iterable[Player], value: float) -> None:
+        C = self._to_coalition(S)
+        if not self._F.is_feasible(C):
+            raise ValueError("Cannot set value: coalition is not feasible (S ∉ F).")
+        self._game.set_value(C, float(value))
+
+    def _to_coalition(self, S: Coalition | Player | Players | Iterable[Player]) -> Coalition:
+        if isinstance(S, Coalition):
+            return S
+        if isinstance(S, int):
+            return Coalition.from_players(S)
+        if isinstance(S, Iterable):
+            return Coalition.from_players(S)
+        raise TypeError("Expected Coalition | Player | Iterable[Player].")
