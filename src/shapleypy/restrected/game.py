@@ -23,3 +23,10 @@ class RestrictedGame:
         self._game = base_game
         self._F = feasible
 
+    def __repr__(self) -> str:
+        """
+        Returns:
+            str: Representation with the number of players and size of F.
+        """
+        return f"RestrictedGame(n={self.number_of_players}, |F|={len(self._F)})"
+
