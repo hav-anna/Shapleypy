@@ -1,3 +1,6 @@
+from collections.abc import Iterable
+from shapleypy._typing import Player, Players
+from shapleypy.coalition import Coalition
 from shapleypy.game import Game
 from shapleypy.restrected.feasible_family import FeasibleFamily
 
@@ -57,3 +60,16 @@ class RestrictedGame:
             FeasibleFamily: The feasible family F.
         """
         return self._F
+
+    def is_feasible(self, S: Coalition) -> bool:
+        return self._F.is_feasible(S)
+
+    def get_value(self, S: Coalition) -> float:
+        if not self.is_feasible(S):
+            raise ValueError("Coalition is not feasible")
+        return self._game.get_value(S)
+
+    def set_value(self, S: Coalition, value: float) -> None:
+        if not self.is_feasible(S):
+            raise ValueError("Cannot set value: coalition not feasible")
+        self._game.set_value(S, value)
