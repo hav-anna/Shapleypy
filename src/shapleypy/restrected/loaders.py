@@ -1,4 +1,5 @@
 from __future__ import annotations
+import ast
 import json
 from pathlib import Path
 from shapleypy.game import Game
@@ -6,15 +7,6 @@ from shapleypy.game import Game
 def load_restricted_game(file: str | Path):
     """
     Loads a restricted game from JSON file.
-    
-    Basic structure:
-    {
-      "n": 3,
-      "values": {
-        "[]": 0.0, "[0]": 1.0, "[1]": 1.0, "[2]": 0.5,
-        "[0,1]": 3.0, "[0,2]": 1.2, "[1,2]": 1.1, "[0,1,2]": 4.0
-      }
-    }
     """
     p = Path(file)
     data = json.loads(p.read_text(encoding="utf-8"))
@@ -23,8 +15,15 @@ def load_restricted_game(file: str | Path):
         raise ValueError("Missing 'n' in JSON.")
     n = int(data["n"])
     
-    # TODO: Load game values
+    # Load game values
+    values_pairs = []
+    vals = data.get("values", {})
+    for k, v in vals.items():
+        players = ast.literal_eval(k)  # Parse coalition strings like "[0,1]"
+        values_pairs.append((players, float(v)))
+    
     game = Game(n)
+    game.set_values(values_pairs)
     
     # TODO: Add feasible family support
     return game
