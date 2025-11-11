@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from shapleypy._typing import Player, Players
 from shapleypy.coalition import Coalition
 from shapleypy.game import Game
-from shapleypy.restrected.feasible_family import FeasibleFamily
+from shapleypy.restricted.feasible_family import FeasibleFamily
 
 
 class RestrictedGame:
