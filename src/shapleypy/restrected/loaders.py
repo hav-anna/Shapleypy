@@ -2,21 +2,43 @@ from __future__ import annotations
 import ast
 import json
 from pathlib import Path
+from typing import Set
+
 from shapleypy.coalition import Coalition, EMPTY_COALITION
 from shapleypy.game import Game
 from shapleypy.restrected.feasible_family import FeasibleFamily
 
+def _feasible_from_permission_data(n: int, permission: dict) -> FeasibleFamily:
+    """
+    Creates feasible family from permission structure using DFS.
+
+    """
+    preds = {int(k): set(map(int, v)) for k, v in permission.items()}
+    for i in range(n):
+        preds.setdefault(i, set())
+
+    res = set()
+    order = list(range(n))
+
+    def dfs(idx: int, taken: set[int]):
+        if idx == len(order):
+            res.add(Coalition.from_players(taken))
+            return
+        i = order[idx]
+        # Option 1: skip player i
+        dfs(idx + 1, taken)
+        # Option 2: include player i only if predecessors are included
+        if preds[i].issubset(taken):
+            taken.add(i)
+            dfs(idx + 1, taken)
+            taken.remove(i)
+
+    dfs(0, set())
+    res.add(EMPTY_COALITION)
+    return FeasibleFamily(n, res)
+
 def _feasible_from_list_data(n: int, feasible_list: list[list[int]]) -> FeasibleFamily:
-    """
-    Creates a feasible family from explicit list of coalitions.
-    
-    Args:
-        n: Number of players
-        feasible_list: List of feasible coalitions as player indices
-        
-    Returns:
-        FeasibleFamily: The created feasible family
-    """
+    """Creates feasible family from explicit list of coalitions."""
     cols = [EMPTY_COALITION] + [Coalition.from_players(lst) for lst in feasible_list]
     return FeasibleFamily(n, cols)
 
@@ -24,11 +46,11 @@ def load_restricted_game(file: str | Path):
     """
     Loads a restricted game from JSON file.
     
-    Now supports:
+    Now supports permission structures:
     {
       "n": 3,
       "values": {...},
-      "feasible": [[], [0], [0,1], [0,2], [0,1,2]]
+      "permission": {"1": [0], "2": [0]}
     }
     """
     p = Path(file)
@@ -48,10 +70,14 @@ def load_restricted_game(file: str | Path):
     game = Game(n)
     game.set_values(values_pairs)
     
-    # Load feasible family if provided
-    if "feasible" in data:
+    # Load feasible family
+    if "permission" in data:
+        feasible = _feasible_from_permission_data(n, data["permission"])
+    elif "feasible" in data:
         feasible = _feasible_from_list_data(n, data["feasible"])
-        # TODO: Return RestrictedGame once we implement permission structure
-        return game, feasible
+    else:
+        # Default to all coalitions
+        all_cols = list(Coalition.all_coalitions(n))
+        feasible = FeasibleFamily(n, all_cols)
     
-    return game
+    return game, feasible
