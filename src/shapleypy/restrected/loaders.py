@@ -2,7 +2,6 @@ from __future__ import annotations
 import ast
 import json
 from pathlib import Path
-from typing import Set
 
 from shapleypy.coalition import Coalition, EMPTY_COALITION
 from shapleypy.game import Game
