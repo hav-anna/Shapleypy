@@ -26,7 +26,7 @@ class Game:
         get_values: Retrieves the values of specified coalitions.
         _init_values: Initializes the values of the coalitions to np.nan for all
             coalitions without empty coalition which is set to zero.
-    """
+    """ 
 
     def __init__(self, number_of_players: int) -> None:
         """
