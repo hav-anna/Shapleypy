@@ -2,12 +2,13 @@
 from __future__ import annotations
 import ast
 import json
+import csv
 from pathlib import Path
 from typing import Set
 from shapleypy.coalition import Coalition, EMPTY_COALITION
 from shapleypy.game import Game
-from shapleypy.restrected.rc_game import RestrictedGame
-from shapleypy.restrected.feasible_family import FeasibleFamily
+from shapleypy.restricted.rc_game import RestrictedGame
+from shapleypy.restricted.feasible_family import FeasibleFamily
 
 
 def _feasible_from_permission_data(n: int, permission: dict) -> FeasibleFamily:
