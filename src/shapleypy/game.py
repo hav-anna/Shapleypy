@@ -27,7 +27,7 @@ class Game:
         _init_values: Initializes the values of the coalitions to np.nan for all
             coalitions without empty coalition which is set to zero.
     """ 
-
+    
     def __init__(self, number_of_players: int) -> None:
         """
         Initializes a new instance of the Game class.
