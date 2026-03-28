@@ -11,6 +11,16 @@ from shapleypy.constants import (
 )
 from shapleypy._typing import Player, Players
 
+def all_one_player_missing_subcoalitions(coalition: Coalition) -> list[Coalition]:
+        players = list(coalition.get_players) 
+    
+        subcoalitions = []
+        for p in players:
+            sub_players = [x for x in players if x != p]
+            subcoalitions.append(Coalition.from_players(sub_players))
+        
+        return subcoalitions
+
 
 class FeasibleFamily:
 
@@ -170,11 +180,11 @@ class FeasibleFamily:
         Returns:
             bool: True if accessible, False otherwise.
         """
-        #F = self._F
-        #for C in F:
-        #    if C != EMPTY_COALITION:
-        #        if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
-        #            return False
+        F = self._F
+        for C in F:
+            if C != EMPTY_COALITION:
+                if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
+                    return False
         return True
 
     def is_union_closed(self) -> bool:
