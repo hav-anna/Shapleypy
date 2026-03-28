@@ -18,7 +18,7 @@ def check_monotonicity_restricted(restricted_game: RestrictedGame) -> bool:
         bool: True if the restricted game is monotone, False otherwise.
     """
     base_game = restricted_game.base_game
-    for coalition in restricted_game.coalitions():
+    for coalition in restricted_game.feasible:
         value_S = base_game.get_value(coalition)
         for subcoalition in coalition.all_subcoalitions():
             if subcoalition != coalition and restricted_game.is_feasible(subcoalition):
