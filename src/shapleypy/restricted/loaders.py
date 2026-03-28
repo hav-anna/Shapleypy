@@ -9,6 +9,10 @@ from shapleypy.coalition import Coalition, EMPTY_COALITION
 from shapleypy.game import Game
 from shapleypy.restricted.rc_game import RestrictedGame
 from shapleypy.restricted.feasible_family import FeasibleFamily
+from shapleypy.constants import (
+    CSV_SEPARATOR_ERROR,
+    LOADERS_MISSING_NUMBER_OF_PLAYERS_ERROR,
+)
 
 
 def _feasible_from_permission_data(n: int, permission: dict) -> FeasibleFamily:
@@ -19,7 +23,6 @@ def _feasible_from_permission_data(n: int, permission: dict) -> FeasibleFamily:
         n (int): Number of players.
         permission (dict): Permission mapping of the form
             { "child": [pred1, pred2, ...], ... } (0-based indices).
-
     Returns:
         FeasibleFamily: The feasible family generated from the given permission structure.
     """
@@ -28,7 +31,7 @@ def _feasible_from_permission_data(n: int, permission: dict) -> FeasibleFamily:
         preds.setdefault(i, set())
 
     res: Set[Coalition] = set()
-    order = list(range(n))  # topological order is trivial if permission is acyclic
+    order = list(range(n)) 
 
     def dfs(idx: int, taken: set[int]):
         if idx == len(order):
@@ -126,3 +129,58 @@ def load_restricted_game(file: str | Path) -> RestrictedGame:
         raise ValueError("Mismatch between 'n' and feasible family size.")
 
     return RestrictedGame(game, feasible)
+
+
+def load_restricted_game_from_csv(
+    file: str, csv_separator: str = ":", coalition_separator: str = ","
+) -> RestrictedGame:
+    """
+    Loads a restricted game from a CSV file.
+    Expects 3 columns: [coalition][csv_separator][value][csv_separator][is_feasible(1/0)]
+
+    Args:
+        file (str): The path to the CSV file.
+        csv_separator (str): The separator used in the CSV file.
+        coalition_separator (str): The separator used for the coalitions.
+
+    Returns:
+        RestrictedGame: The loaded restricted game.
+    """
+    if csv_separator == coalition_separator:
+        raise ValueError(CSV_SEPARATOR_ERROR)
+
+    n = None
+    values = []
+    feasible_lists = []
+    
+    with open(file, newline="") as f:
+        reader = csv.reader(f, delimiter=csv_separator)
+        for row in reader:
+            if len(row) > 0:
+                if row[0] == "n":
+                    n = int(row[1])
+                else:
+                    key_list = []
+                    if row[0] != "":
+                        key_list = list(map(int, row[0].split(coalition_separator)))
+                    value = float(row[1])
+                    values.append((key_list, value))
+                    is_feas = True
+                    if len(row) > 2:
+                        is_feas_str = str(row[2]).strip().lower()
+                        if is_feas_str in ("0", "false"):
+                            is_feas = False
+                            
+                    if is_feas:
+                        feasible_lists.append(key_list)
+                        
+    if n is None:
+        raise ValueError(LOADERS_MISSING_NUMBER_OF_PLAYERS_ERROR)
+        
+    game = Game(n)
+    game.set_values(values)
+    
+    feasible_coalitions = [Coalition.from_players(p) for p in feasible_lists]
+    ff = FeasibleFamily(n, feasible_coalitions)
+    
+    return RestrictedGame(game, ff)
