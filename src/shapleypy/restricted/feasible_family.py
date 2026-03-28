@@ -7,7 +7,7 @@ from shapleypy.constants import (
     MAXIMUM_NUMBER_OF_PLAYERS,
     MINIMUM_NUMBER_OF_PLAYERS,
     COALITION_NUMBER_OF_PLAYERS_ERROR,
-    all_one_player_missing_subcoalitions,
+    #all_one_player_missing_subcoalitions,
 )
 from shapleypy._typing import Player, Players
 
@@ -69,6 +69,7 @@ class FeasibleFamily:
             return False
         return C in self._F
     
+    @property
     def n(self) -> int:
         """
         Returns:
@@ -169,11 +170,11 @@ class FeasibleFamily:
         Returns:
             bool: True if accessible, False otherwise.
         """
-        F = self._F
-        for C in F:
-            if C != EMPTY_COALITION:
-                if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
-                    return False
+        #F = self._F
+        #for C in F:
+        #    if C != EMPTY_COALITION:
+        #        if not any(P in F for P in all_one_player_missing_subcoalitions(C)):
+        #            return False
         return True
 
     def is_union_closed(self) -> bool:
