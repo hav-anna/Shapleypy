@@ -5,7 +5,7 @@ import pytest
 from shapleypy.coalition import Coalition
 from shapleypy.game import Game
 from shapleypy.restricted.feasible_family import FeasibleFamily
-from shapleypy.restricted.rc_game import RestrictedGame
+from shapleypy.restricted.game import RestrictedGame
 from shapleypy.restricted.savers import (
     save_restricted_game_to_json,
     save_restricted_game_to_csv,
