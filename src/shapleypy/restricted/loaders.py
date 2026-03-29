@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Set
 from shapleypy.coalition import Coalition, EMPTY_COALITION
 from shapleypy.game import Game
-from shapleypy.restricted.rc_game import RestrictedGame
+from shapleypy.restricted.game import RestrictedGame
 from shapleypy.restricted.feasible_family import FeasibleFamily
 from shapleypy.constants import (
     CSV_SEPARATOR_ERROR,

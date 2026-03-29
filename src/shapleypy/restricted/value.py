@@ -2,7 +2,8 @@ from __future__ import annotations
 import itertools
 import math
 from typing import Iterable
-from shapleypy.restricted.rc_game import RestrictedGame
+from shapleypy.restricted.game
+import RestrictedGame
 from shapleypy.coalition import Coalition
 
 def shapley_feasible(rg: RestrictedGame, *, monte_carlo: int | None = None) -> list[float]:
