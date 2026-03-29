@@ -24,9 +24,7 @@ def perfect_restricted_game() -> RestrictedGame:
     return RestrictedGame(game, ff)
 
 
-# ---------------------------------------------------------------------------
-# JSON LOADERS
-# ---------------------------------------------------------------------------
+#region load_restricted_game_from_json
 
 def test_json_input(perfect_restricted_game: RestrictedGame, tmpdir) -> None:
     json_data = {
@@ -64,9 +62,8 @@ def test_json_missing_feasible(tmpdir) -> None:
     assert loaded_rg.number_of_players == 3
     assert len(list(loaded_rg.feasible)) == 8
 
-# ---------------------------------------------------------------------------
-# CSV LOADERS
-# ---------------------------------------------------------------------------
+#endregion
+#region load_restricted_game_from_csv
 
 def test_csv_input(perfect_restricted_game: RestrictedGame, tmpdir) -> None:
     csv_content = """n:3
@@ -98,3 +95,5 @@ def test_csv_same_separators() -> None:
             csv_separator=",",
             coalition_separator=",",
         )
+
+#endregion
