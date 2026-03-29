@@ -66,7 +66,7 @@ def _feasible_from_list_data(n: int, feasible_list: list[list[int]]) -> Feasible
     return FeasibleFamily(n, cols)
 
 
-def load_restricted_game(file: str | Path) -> RestrictedGame:
+def load_restricted_game_from_json(file: str | Path) -> RestrictedGame:
     """
     Loads a restricted game (Game + FeasibleFamily) from a JSON file.
 
