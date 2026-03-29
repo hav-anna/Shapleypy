@@ -43,8 +43,6 @@ def test_check_superadditivity_restricted(perfect_restricted_game: RestrictedGam
 
 def test_check_convexity_restricted(perfect_restricted_game: RestrictedGame) -> None:
     rg = perfect_restricted_game
-    
-    # 1. Pozitivní test
     assert check_convexity_restricted(rg) is True
     
     rg.base_game.set_value(Coalition.from_players([0, 1, 2]), 4.0)
