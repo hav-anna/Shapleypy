@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from shapleypy.coalition import Coalition
-from shapleypy.restricted.rc_game import RestrictedGame
+from shapleypy.restricted.game import RestrictedGame
 from shapleypy.coalition import EMPTY_COALITION
 
 

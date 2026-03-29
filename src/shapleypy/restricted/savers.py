@@ -1,8 +1,7 @@
 import csv
 import json
 from shapleypy.coalition import Coalition
-from shapleypy.restricted.game
-import RestrictedGame
+from shapleypy.restricted.game import RestrictedGame
 from shapleypy.constants import CSV_SEPARATOR_ERROR
 
 def _prepare_restricted_game_dict(restricted_game: RestrictedGame) -> dict:
