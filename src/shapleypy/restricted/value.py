@@ -185,7 +185,7 @@ def _components_accessible_union_stable(
 
 
 def shapley_accessible_union_stable(rg: RestrictedGame) -> list[float]:
-   """
+    """
     Compute the restricted Shapley value for an accessible union stable family.
 
     Args:

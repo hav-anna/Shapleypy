@@ -96,7 +96,7 @@ def check_convexity_restricted(restricted_game: RestrictedGame) -> bool:
 
 
 def check_antimatroid(restricted_game: RestrictedGame) -> bool:
-     """
+    """
     Check if the feasible family is an antimatroid.
 
     The feasible family must contain the empty coalition, satisfy accessibility
