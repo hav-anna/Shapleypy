@@ -30,29 +30,6 @@ def _all_coalitions(number_of_players: int) -> list[Coalition]:
 
     return coalitions
 
-
-def _get_cached_value(
-    coalition: Coalition,
-    value_function,
-    value_cache: dict[Coalition, float],
-) -> float:
-    """
-    Return the value of a coalition and store it in cache.
-
-    Args:
-        coalition: Coalition whose value is needed.
-        value_function: Function used to compute the value.
-        value_cache: Dictionary with already computed values.
-
-    Returns:
-        Value of the coalition.
-    """
-    if coalition not in value_cache:
-        value_cache[coalition] = float(value_function(coalition))
-
-    return value_cache[coalition]
-
-
 def _restricted_game_from_value_function(
     rg: RestrictedGame,
     value_function,
