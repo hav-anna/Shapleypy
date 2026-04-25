@@ -93,3 +93,90 @@ def check_convexity_restricted(restricted_game: RestrictedGame) -> bool:
                 if (val_union + val_intersection) < (val_S + val_T):
                     return False
     return True
+
+
+def check_antimatroid(restricted_game: RestrictedGame) -> bool:
+     """
+    Check if the feasible family is an antimatroid.
+
+    The feasible family must contain the empty coalition, satisfy accessibility
+    and be closed under union.
+
+    Args:
+        restricted_game: The restricted game to check.
+
+    Returns:
+        True if the feasible family is an antimatroid, False otherwise.
+    """
+    feasible_coalitions = list(restricted_game.feasible)
+
+    if EMPTY_COALITION not in feasible_coalitions:
+        return False
+
+    for coalition in feasible_coalitions:
+        if coalition != EMPTY_COALITION:
+            has_extreme_player = False
+
+            for player in coalition.get_players:
+                smaller_coalition = coalition - player
+
+                if smaller_coalition in feasible_coalitions:
+                    has_extreme_player = True
+                    break
+
+            if has_extreme_player is False:
+                return False
+
+    for S in feasible_coalitions:
+        for T in feasible_coalitions:
+            union_ST = S + T
+
+            if union_ST not in feasible_coalitions:
+                return False
+
+    return True
+
+
+def check_accessible_union_stable(restricted_game: RestrictedGame) -> bool:
+    """
+    Check if the feasible family is accessible union stable.
+
+    The feasible family must contain the empty coalition, satisfy accessibility
+    and satisfy union stability for coalitions with non-empty intersection.
+
+    Args:
+        restricted_game: The restricted game to check.
+
+    Returns:
+        True if the feasible family is accessible union stable, False otherwise.
+    """
+    feasible_coalitions = list(restricted_game.feasible)
+
+    if EMPTY_COALITION not in feasible_coalitions:
+        return False
+
+    for coalition in feasible_coalitions:
+        if coalition != EMPTY_COALITION:
+            has_extreme_player = False
+
+            for player in coalition.get_players:
+                smaller_coalition = coalition - player
+
+                if smaller_coalition in feasible_coalitions:
+                    has_extreme_player = True
+                    break
+
+            if has_extreme_player is False:
+                return False
+
+    for S in feasible_coalitions:
+        for T in feasible_coalitions:
+            intersection_ST = S * T
+
+            if intersection_ST != EMPTY_COALITION:
+                union_ST = S + T
+
+                if union_ST not in feasible_coalitions:
+                    return False
+
+    return True
