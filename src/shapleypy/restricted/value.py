@@ -7,6 +7,8 @@ from shapleypy.coalition import Coalition
 from shapleypy.coalition import EMPTY_COALITION
 from shapleypy.restricted.classes_checkers import check_antimatroid
 from shapleypy.restricted.classes_checkers import check_accessible_union_stable
+from shapleypy.game import Game
+from shapleypy.solution_concept.shapley_value import shapley
 
 
 def _all_coalitions(number_of_players: int) -> list[Coalition]:
@@ -51,12 +53,36 @@ def _get_cached_value(
     return value_cache[coalition]
 
 
+def _restricted_game_from_value_function(
+    rg: RestrictedGame,
+    value_function,
+) -> Game:
+    """
+    Create a game from a restricted value function.
+
+    Args:
+        rg: The restricted game.
+        value_function: Function assigning a value to each coalition.
+
+    Returns:
+        Game with values of the restricted game.
+    """
+    game = Game(rg.number_of_players)
+    all_coalitions = _all_coalitions(rg.number_of_players)
+
+    for coalition in all_coalitions:
+        value = float(value_function(coalition))
+        game.set_value(coalition, value)
+
+    return game
+
+
 def _shapley_from_restricted_value(
     rg: RestrictedGame,
     value_function,
 ) -> list[float]:
     """
-    Compute the Shapley value from a given value function.
+    Compute the Shapley value of a restricted game.
 
     Args:
         rg: The restricted game.
@@ -65,40 +91,10 @@ def _shapley_from_restricted_value(
     Returns:
         List of Shapley values for all players.
     """
-    n = rg.number_of_players
-    phi = [0.0] * n
-    value_cache = {}
+    restricted_game = _restricted_game_from_value_function(rg, value_function)
+    values = shapley(restricted_game)
 
-    all_coalitions = _all_coalitions(n)
-
-    for player in range(n):
-        for coalition in all_coalitions:
-            if player not in coalition:
-                coalition_size = len(coalition)
-                coalition_with_player = coalition + player
-
-                coefficient = (
-                    math.factorial(coalition_size)
-                    * math.factorial(n - coalition_size - 1)
-                    / math.factorial(n)
-                )
-
-                value_with_player = _get_cached_value(
-                    coalition_with_player,
-                    value_function,
-                    value_cache,
-                )
-
-                value_without_player = _get_cached_value(
-                    coalition,
-                    value_function,
-                    value_cache,
-                )
-
-                marginal_contribution = value_with_player - value_without_player
-                phi[player] += coefficient * marginal_contribution
-
-    return phi
+    return list(values)
 
 
 def _interior_antimatroid(
